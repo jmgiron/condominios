@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: resisync-postgres
+    environment:
+      POSTGRES_USER: resisync_user
+      POSTGRES_PASSWORD: resisync_password
+      POSTGRES_DB: resisync_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  postgres_data:
