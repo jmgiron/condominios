@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
-  // Conectándose a tu computadora por Wi-Fi (para celulares físicos locales)
-  static const String baseUrl = 'http://192.168.0.8:8081/api'; 
+  // Conectándose al entorno de producción en AWS
+  static const String baseUrl = 'http://zentari-env.eba-5pihvsqy.us-east-1.elasticbeanstalk.com/api'; 
   final Dio dio;
 
   ApiClient() : dio = Dio(BaseOptions(baseUrl: baseUrl)) {

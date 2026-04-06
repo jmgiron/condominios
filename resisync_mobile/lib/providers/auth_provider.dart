@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:dio/dio.dart';
 import '../core/api_client.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -37,7 +38,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<String?> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
 
@@ -52,15 +53,20 @@ class AuthProvider extends ChangeNotifier {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('jwt_token', token);
         await checkAuthStatus();
-        return true;
+        return null;
       }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        return 'Server Error ${e.response?.statusCode}: ${e.response?.data}';
+      }
+      return 'Network Error: ${e.message}';
     } catch (e) {
-      print('Error de login: $e');
+      return 'Unexpected Error: $e';
     } finally {
       _isLoading = false;
       notifyListeners();
     }
-    return false;
+    return 'Invalid or empty server response';
   }
 
   Future<void> logout() async {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import '../../providers/visit_provider.dart';
+import '../../models/visit.dart';
 class VisitFormScreen extends StatefulWidget {
   const VisitFormScreen({super.key});
 
@@ -90,19 +92,47 @@ class _VisitFormScreenState extends State<VisitFormScreen> {
               ),
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: () {
+                onPressed: context.watch<VisitProvider>().isLoading ? null : () async {
                   if (_formKey.currentState!.validate() && _selectedDate != null && _selectedTime != null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Visita registrada (Simulado)')),
+                    final dateTime = DateTime(
+                      _selectedDate!.year,
+                      _selectedDate!.month,
+                      _selectedDate!.day,
+                      _selectedTime!.hour,
+                      _selectedTime!.minute,
                     );
-                    Navigator.pop(context);
+                    
+                    final visit = Visit(
+                      nombreVisitante: _nameController.text.trim(),
+                      fechaLlegada: dateTime,
+                      whatsapp: _whatsappController.text.trim(),
+                      duracionEstimada: 60,
+                      tipoVisita: _visitType,
+                    );
+                    
+                    final error = await context.read<VisitProvider>().registrarVisita(visit);
+                    
+                    if (mounted) {
+                      if (error == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Visita registrada exitosamente')),
+                        );
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(error), backgroundColor: Colors.red),
+                        );
+                      }
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Completa todos los campos')),
                     );
                   }
                 },
-                child: const Text('Generar Acceso y QR'),
+                child: context.watch<VisitProvider>().isLoading 
+                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Text('Generar Acceso y QR'),
               ),
             ],
           ),

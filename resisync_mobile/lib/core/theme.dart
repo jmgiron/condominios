@@ -3,8 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Colores más intensos y vivos estilo Munily
-  static const Color primaryColor = Color(0xFF0EA5E9); // Un vibrante azul cielo / celeste intenso
-  static const Color secondaryColor = Color(0xFF10B981); // Un verde vibrante para aprobar
+  static const Color primaryColor = Color(0xFF1877F2);
+  static const Color secondaryColor = Color(0xFF6203FF);
+  static const Color tertiaryColor = Color(0xFFFFCD00);
   static const Color backgroundColor = Color(0xFFF8FAFC);
   static const Color darkBackgroundColor = Color(0xFF0F172A);
   static const Color surfaceColor = Colors.white;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/visit_provider.dart';
 import 'visit_form_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,6 +13,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<VisitProvider>().fetchVisits();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,9 +177,30 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(height: 32),
                         const _SectionHeader(title: 'Mis Visitas Activas', actionText: 'Historial >'),
                         const SizedBox(height: 16),
-                        _VisitCard(theme: theme, visitorName: 'Administrador', unit: '119D', time: 'Hoy - 3:00 p.m.'),
-                        const SizedBox(height: 12),
-                        _VisitCard(theme: theme, visitorName: 'Paquete Reparto', unit: '119D', time: 'Hoy - 5:30 p.m.', isDelivery: true),
+                        Consumer<VisitProvider>(
+                          builder: (context, provider, child) {
+                            if (provider.isLoading && provider.visits.isEmpty) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            if (provider.visits.isEmpty) {
+                              return const Center(child: Text('No tienes visitas activas'));
+                            }
+                            return Column(
+                              children: provider.visits.map((visit) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12.0),
+                                  child: _VisitCard(
+                                    theme: theme,
+                                    visitorName: visit.nombreVisitante,
+                                    unit: visit.residenteId != null ? 'ID: ${visit.residenteId}' : 'Tú', // MOCK Unit for now
+                                    time: '${visit.fechaLlegada.day}/${visit.fechaLlegada.month} - ${visit.fechaLlegada.hour}:${visit.fechaLlegada.minute.toString().padLeft(2, '0')}',
+                                    isDelivery: visit.tipoVisita == 'Delivery',
+                                  ),
+                                );
+                              }).toList(),
+                            );
+                          },
+                        ),
                         const SizedBox(height: 80), // Espacio para la barra inferior
                       ],
                     ),

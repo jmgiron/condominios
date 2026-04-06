@@ -16,13 +16,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     final auth = Provider.of<AuthProvider>(context, listen: false);
-    final success = await auth.login(
+    final errorMessage = await auth.login(
       _emailController.text.trim(),
       _passwordController.text,
     );
-    if (!success && mounted) {
+    if (errorMessage != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al iniciar sesión. Verifica tus credenciales.')),
+        SnackBar(
+          content: Text(errorMessage),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'OK',
+            textColor: Colors.white,
+            onPressed: () {},
+          ),
+        ),
       );
     }
   }
@@ -40,10 +48,16 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.apartment_rounded, size: 80, color: Color(0xFF4F46E5)),
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 100,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(Icons.apartment_rounded, size: 80, color: Color(0xFF1877F2));
+                  },
+                ),
                 const SizedBox(height: 24),
                 Text(
-                  'Bienvenido a ResiSync',
+                  'Bienvenido a ZENTARI',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
